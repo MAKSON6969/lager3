@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Снеки</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <h1>🍿 Снеки</h1>
+
+    <div class="grid" id="snackGrid">
+      <!-- Одна картка -->
+      <div class="card">
+        <input type="file" accept="image/*" onchange="previewImage(this)">
+        <img src="https://via.placeholder.com/240x150?text=Фото" alt="Снек">
+        <input type="text" placeholder="Назва снека">
+        <input type="number" placeholder="Кількість (кг)">
+        <input type="number" placeholder="Ціна (zł)">
+      </div>
+    </div>
+
+    <button class="add-btn" onclick="addSnack()">➕ Додати снек</button>
+    <button class="calc-btn" onclick="calculateSnacks()">💰 Порахувати</button>
+
+    <div id="result" class="result-box"></div>
+
+    <br><a href="index.html" class="menu-item">⬅ Назад</a>
+  </div>
+
+  <script>
+    function addSnack() {
+      const grid = document.getElementById("snackGrid");
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.innerHTML = `
+        <input type="file" accept="image/*" onchange="previewImage(this)">
+        <img src="https://via.placeholder.com/240x150?text=Фото" alt="Снек">
+        <input type="text" placeholder="Назва снека">
+        <input type="number" placeholder="Кількість (кг)">
+        <input type="number" placeholder="Ціна (zł)">
+      `;
+      grid.appendChild(card);
+    }
+
+    function calculateSnacks() {
+      const cards = document.querySelectorAll(".card");
+      let total = 0;
+      let totalKg = 0;
+      cards.forEach(card => {
+        const kg = parseFloat(card.querySelectorAll("input")[2].value) || 0;
+        const price = parseFloat(card.querySelectorAll("input")[3].value) || 0;
+        total += price;
+        totalKg += kg;
+      });
+      const uah = total * 9;
+      document.getElementById("result").innerHTML = `
+        ✅ Всього: <strong>${total.toFixed(2)} zł</strong><br>
+        💵 В гривнях: <strong>${uah.toFixed(2)} грн</strong><br>
+        ⚖️ Загальна вага: <strong>${totalKg.toFixed(2)} кг</strong>
+      `;
+    }
+
+    function previewImage(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = input.nextElementSibling;
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
+
+
+<!-- ВСЕ ЗАЛИШАЄТЬСЯ ЯК БУЛО ДО ЦЬОГО -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    loadSnacksFromStorage();
+  });
+
+  function saveToStorage() {
+    const cards = document.querySelectorAll(".card");
+    const snacks = [];
+    cards.forEach(card => {
+      const name = card.querySelectorAll("input")[1].value;
+      const weight = card.querySelectorAll("input")[2].value;
+      const price = card.querySelectorAll("input")[3].value;
+      snacks.push({ name, weight, price });
+    });
+    localStorage.setItem("snacks", JSON.stringify(snacks));
+  }
+
+  function loadSnacksFromStorage() {
+    const saved = localStorage.getItem("snacks");
+    if (!saved) return;
+    const snacks = JSON.parse(saved);
+    const grid = document.getElementById("snackGrid");
+    grid.innerHTML = '';
+    snacks.forEach(data => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.innerHTML = `
+        <input type="file" accept="image/*" onchange="previewImage(this)">
+        <img src="https://via.placeholder.com/240x150?text=Фото" alt="Снек">
+        <input type="text" placeholder="Назва снека" value="${data.name}">
+        <input type="number" placeholder="Кількість (кг)" value="${data.weight}">
+        <input type="number" placeholder="Ціна (zł)" value="${data.price}">
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function addSnack() {
+    const grid = document.getElementById("snackGrid");
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.innerHTML = `
+      <input type="file" accept="image/*" onchange="previewImage(this)">
+      <img src="https://via.placeholder.com/240x150?text=Фото" alt="Снек">
+      <input type="text" placeholder="Назва снека">
+      <input type="number" placeholder="Кількість (кг)">
+      <input type="number" placeholder="Ціна (zł)">
+    `;
+    grid.appendChild(card);
+    bindInputs(card);
+  }
+
+  function bindInputs(card) {
+    const inputs = card.querySelectorAll("input");
+    inputs.forEach(input => {
+      input.addEventListener("input", saveToStorage);
+    });
+  }
+
+  function previewImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = input.nextElementSibling;
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function calculateSnacks() {
+    const cards = document.querySelectorAll(".card");
+    let total = 0;
+    let totalKg = 0;
+    cards.forEach(card => {
+      const kg = parseFloat(card.querySelectorAll("input")[2].value) || 0;
+      const price = parseFloat(card.querySelectorAll("input")[3].value) || 0;
+      total += price;
+      totalKg += kg;
+    });
+    const uah = total * 9;
+    document.getElementById("result").innerHTML = `
+      ✅ Всього: <strong>${total.toFixed(2)} zł</strong><br>
+      💵 В гривнях: <strong>${uah.toFixed(2)} грн</strong><br>
+      ⚖️ Загальна вага: <strong>${totalKg.toFixed(2)} кг</strong>
+    `;
+  }
+
+  // Повісити події на старі картки
+  setTimeout(() => {
+    document.querySelectorAll(".card").forEach(bindInputs);
+  }, 50);
+</script>
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Калькулятор скиду</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🧮 Калькулятор скиду</h1>
+
+    <label>💰 Загальна сума (zł):</label>
+    <input type="number" id="total" placeholder="Наприклад: 325">
+
+    <label>👥 Кількість людей:</label>
+    <input type="number" id="people" placeholder="Наприклад: 5">
+
+    <button onclick="generateInputs()">➕ Вказати хто скільки скинув</button>
+    <div id="customInputs"></div>
+
+    <button onclick="calculate()">Порахувати</button>
+
+    <div id="result"></div>
+
+    <br><a href="index.html" class="menu-btn">⬅ Назад</a>
+  </div>
+
+  <script>
+    function generateInputs() {
+      const people = parseInt(document.getElementById('people').value);
+      const container = document.getElementById('customInputs');
+      container.innerHTML = "";
+
+      for (let i = 0; i < people; i++) {
+        const div = document.createElement('div');
+        div.innerHTML = `👤 ${i+1}: <input type="number" placeholder="Сума, яку вже скинув" class="paid"> zł`;
+        container.appendChild(div);
+      }
+    }
+
+    function calculate() {
+      const total = parseFloat(document.getElementById('total').value);
+      const people = parseInt(document.getElementById('people').value);
+      const paidInputs = document.querySelectorAll('.paid');
+
+      if (!total || !people) {
+        alert("Будь ласка, заповніть всі поля!");
+        return;
+      }
+
+      const perPerson = total / people;
+      let resultHTML = `<strong>Кожен має скинути:</strong> ${perPerson.toFixed(2)} zł / ${(perPerson * 9).toFixed(2)} грн<br><br>`;
+
+      if (paidInputs.length > 0) {
+        paidInputs.forEach((input, i) => {
+          const paid = parseFloat(input.value) || 0;
+          const diff = paid - perPerson;
+          if (diff > 0) {
+            resultHTML += `👤 ${i+1} переплатив на ${diff.toFixed(2)} zł (${(diff*9).toFixed(2)} грн)<br>`;
+          } else if (diff < 0) {
+            resultHTML += `👤 ${i+1} має ще скинути ${(Math.abs(diff)).toFixed(2)} zł (${(Math.abs(diff)*9).toFixed(2)} грн)<br>`;
+          } else {
+            resultHTML += `👤 ${i+1} заплатив рівно<br>`;
+          }
+        });
+      }
+
+      document.getElementById('result').innerHTML = resultHTML;
+    }
+  </script>
+</body>
+</html>
